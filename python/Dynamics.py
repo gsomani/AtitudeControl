@@ -5,11 +5,6 @@ def spacecraftDynamics(T, q, omega, I):
   """
   Calculates angular acceleration based on Euler's equations.
 
-  Args:
-      T (array): Control torque vector (roll, pitch, yaw).
-      omega (array): Angular velocity vector (roll, pitch, yaw rates).
-      I (array): Inertia matrix (assumed diagonal).
-
   Returns:
       array: Angular acceleration vector.
   """
