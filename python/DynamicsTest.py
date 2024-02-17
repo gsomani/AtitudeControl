@@ -57,11 +57,11 @@ class TestSpacecraftDynamics(unittest.TestCase):
         plt.title(title)
         plt.savefig(f'{title}-Omega')
 
-        # 3D Orientation Plot
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
         vertices = np.array([[i,j,k] for i in [-1,1] for j in [-1,1] for k in [-1,1]])
+        
         edges = []
 
         for i,v in enumerate(vertices):
@@ -69,23 +69,16 @@ class TestSpacecraftDynamics(unittest.TestCase):
             if np.linalg.norm(u-v) == 2:
               edges.append([i,i+1+j])
 
-        # Initial plot setup
-        rotatedVertices = vertices.T  # Assume no initial rotation for simplicity
-        #lines = [ax.plot(rotatedVertices[0,i*4:(i+1)*4], rotatedVertices[1,i*4:(i+1)*4], rotatedVertices[2,i*4:(i+1)*4]) for i in range(3)]
+        rotatedVertices = vertices.T
         lines = []
         for e in edges:
           l = np.array([ rotatedVertices[:,e[i]] for i in range(2) ]).T
-          lines.append(ax.plot(*l))
+          lines.append(ax.fill(*l))
 
-       #lines = [ax.plot( rotatedVertices[0,i], rotatedVertices[1,i], rotatedVertices[2,i*4:(i+1)*4]) for i in range(3)]
-
-
-        #lines = [ax.plot(rotatedVertices[0,:], rotatedVertices[1,:], rotatedVertices[2,:])]
         ax.set_xlim([-2, 2])
         ax.set_ylim([-2, 2])
         ax.set_zlim([-2, 2])
 
-        # Update vertices at a few simulation instants
         steps = 100
         print(quatHistory)
         for i in range(0, len(time),50):
