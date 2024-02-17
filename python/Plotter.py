@@ -1,4 +1,10 @@
-def plot(time, omegaHistory, quatHistory, title=''):
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from Quaternion import quaternionToRotationMatrix
+
+def plot(omegaHistory, quatHistory, title=''):
+    time = range(len(omegaHistory))
     plt.figure()
     plt.plot(time, omegaHistory[:, 0], label='Roll')  # Plot roll rate
     plt.plot(time, omegaHistory[:, 1], label='Pitch')  # Plot pitch rate
@@ -25,14 +31,14 @@ def plot(time, omegaHistory, quatHistory, title=''):
     lines = []
     for e in edges:
       l = np.array([ rotatedVertices[:,e[i]] for i in range(2) ]).T
-      lines.append(ax.fill(*l))
+      lines.append(ax.plot(*l))
 
     ax.set_xlim([-2, 2])
     ax.set_ylim([-2, 2])
     ax.set_zlim([-2, 2])
 
     print(quatHistory)
-    for i in range(0, len(time),50):
+    for i in range(0, len(time), 50):
         rotationMatrix = quaternionToRotationMatrix(quatHistory[i])
         rotatedVertices = rotationMatrix @ vertices.T
 

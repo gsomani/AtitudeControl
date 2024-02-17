@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 from Dynamics import spacecraftDynamics
 from PIDController import PIDController
+import Plotter
 
 class TestPIDController(unittest.TestCase):
 
@@ -10,7 +11,7 @@ class TestPIDController(unittest.TestCase):
         self.qInit = np.array([1.0, 0.0, 0.0, 0.0])  # Initial orientation
         self.omegaInit = np.array([0.0, 0.0, 0.0])
         self.dt = 0.01
-        self.simTime = 100
+        self.simTime = 300
 
     def test1(self):
         """
@@ -21,10 +22,13 @@ class TestPIDController(unittest.TestCase):
         qd = np.array([0.8, 0.0, 0.3, 0.5])
 
         # PID Controller Gains
-        Kp = np.array([0.5, 0.5, 0.5])
-        Kd = np.array([0.2, 0.2, 0.2])
+        Kp = np.array([0.2, 0.2, 0.2])
+        Kd = np.array([0.1, 0.1, 0.1])
         Ki = np.array([0.0, 0.0, 0.0])
+  
+        omegaHistory, quatHistory = self.simulate(qd, Kp, Kd, Ki) 
 
+        Plotter.plot(omegaHistory, quatHistory, title='')
 
     def simulate(self, qd, Kp, Ki, Kd):
         """
@@ -49,3 +53,6 @@ class TestPIDController(unittest.TestCase):
             quatHistory.append(q)
 
         return np.array(omegaHistory), np.array(quatHistory)
+
+if __name__ == '__main__':
+    unittest.main()
