@@ -1,32 +1,37 @@
 import numpy as np
-from Quaternion import calculateQuatError, extractErrorVector
+from Quaternion import calculateQuatError, extractErrorVector, calculateCurrentOrientation
 import matplotlib.pyplot as plt
 
 
 class PIDController(object):
-    def __init__(self, kp, ki, kd): # holdCount=80, initialShift=10, dropCount=8):
-        self.kp, self.ki, self.kd = kp, ki, kd  # self.calculate_gains(loopBandwidth, damping)
+    def __init__(self, kp, ki, kd, initialOrientation, dt=0.01): # holdCount=80, initialShift=10, dropCount=8):
+        self.kp, self.ki, self.kd = kp, ki, kd
         self.integral = np.zeros(3)
         self.prevErrorVector = np.zeros(3)
         self.errorVectorList = []
+        self.quatList = [initialOrientation]
+        self.dt = dt
         # self.n = 0
         # self.m = 0
         # self.holdCount = holdCount
         # self.factor = (1 << initialShift)
         # self.dropCount = dropCount
 
-    def __call__(self, desiredQ, currentQ, dt):
+
+    def __call__(self, desiredQ, omega):
+        currentQ = calculateCurrentOrientation(self.quatList[-1], omega, self.dt)
+        qe = calculateQuatError(desiredQ, currentQ)
+
+        errorVector = extractErrorVector(qe)
+        errorDot = (errorVector - self.prevErrorVector) /self.dt
+        self.integral += errorVector * self.dt
         # f = self.factor if self.factor >= 1 else 1
         # self.integral += error*f
-        qe = calculateQuatError(desiredQ, currentQ)
-        # print(f'{desiredQ}, {currentQ}')
-        errorVector = extractErrorVector(qe)
-        errorDot = (errorVector - self.prevErrorVector) /dt
-        self.integral += errorVector * dt
-        self.prevErrorVector = errorVector
 
         output = (self.kp * errorVector) + (self.ki * self.integral) + (self.kd * errorDot)
+
         self.errorVectorList.append(errorVector)
+        self.prevErrorVector = errorVector
 
         # self.n += 1
         # if self.n == self.holdCount and self.dropCount > 0:

@@ -19,7 +19,7 @@ def plot(omegaHistory, quatHistory, title=''):
     ax = fig.add_subplot(111, projection='3d')
 
     vertices = np.array([[i,j,k] for i in [-1,1] for j in [-1,1] for k in [-1,1]])
-    
+
     edges = []
 
     for i,v in enumerate(vertices):
@@ -37,8 +37,7 @@ def plot(omegaHistory, quatHistory, title=''):
     ax.set_ylim([-2, 2])
     ax.set_zlim([-2, 2])
 
-    print(quatHistory)
-    for i in range(0, len(time), 50):
+    for i in range(0, len(time), 25):
         rotationMatrix = quaternionToRotationMatrix(quatHistory[i])
         rotatedVertices = rotationMatrix @ vertices.T
 

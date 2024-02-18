@@ -45,6 +45,14 @@ def quaternionMultiply(q1, q2):
 
   return np.array([w, x, y, z])
 
+def calculateCurrentOrientation(previousQ, omega, dt):
+  qdot = quaternionKinematics(previousQ, omega)
+  q = previousQ + qdot * dt  # (Assume simple Euler integration for now)
+
+  # Normalize quaternion
+  q = q / np.linalg.norm(q)
+  return q
+
 def calculateQuatError(desiredQ, currentQ):
   """Calculates error quaternion (qe = desiredQ^-1 * currentQ)."""
   return quaternionMultiply(quaternionInverse(desiredQ), currentQ)
