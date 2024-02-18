@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from Quaternion import quaternionToRotationMatrix
+from itertools import chain
 
 def plotOmega(omegaHistory, title=''):
     time = range(len(omegaHistory))
@@ -35,16 +36,15 @@ def cuboid(mass, I):
     cubeVertices = hypercubeTraversal(3)
     vertices = hyperCuboidTraversal([[-d/2,d/2] for d in dim])
 
-    edges = [ [i,(i+1)%8] for i in range(8)]
-    edges += [[0, 3], [1, 6], [2, 5], [4, 7]]
-
     faces = [[[] for i in range(2)] for j in range(3)]
+    edges = [[[[] for i in range(2)] for j in range(2)] for k in range(3)]
 
     for i,v in enumerate(cubeVertices):
       for j in range(3):
         faces[j][v[j]].append(i)
+        edges[j][v[(j+1)%3]][v[(j+2)%3]].append(i)
 
-    return dim, vertices, edges, faces
+    return dim, vertices, list(chain(*(chain(*edges)))), list(chain(*faces))
 
 def plot3D(quatHistory, title=''):
     fig = plt.figure()
@@ -66,7 +66,8 @@ def plot3D(quatHistory, title=''):
 
     ax.set_box_aspect([1,1,1])
 
-    qv = 3*np.eye(3)
+    length = 3
+    qv = length*np.eye(3)
     center = np.zeros(3)
     quivers = []
 
@@ -91,3 +92,5 @@ def plot3D(quatHistory, title=''):
       plt.pause(0.1)
 
     plt.show()
+
+print(cuboid(750, np.array([900,800,600])))
