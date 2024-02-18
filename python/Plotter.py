@@ -16,36 +16,60 @@ def plotOmega(omegaHistory, title=''):
     plt.savefig(f'{title}-Omega')
     plt.show()
 
+def shapeFromInertia(mass, I):
+    return (6/mass)*(sum(I) - 2*I)
+
+def gray(n, width):
+    g = n ^ (n >> 1)
+    return [(g >> i) & 1 for i in range(width)]
+
+def hypercubeTraversal(n):
+    return [gray(i, n) for i in range(1 << n)]
+
+def hyperCuboidTraversal(box):
+    return np.array([[box[i][c] for i, c in enumerate(b)] for b in hypercubeTraversal(len(box))])
+
+def cube(mass, I):
+    dim = shapeFromInertia(mass, I)
+    vertices = hyperCuboidTraversal([[-d/2,d/2] for d in dim])
+
+    edges = []
+    faces = [[] for j in range(6)]
+
+    edges = [ [i,(i+1)%8] for i in range(8)]
+
+    edges += [[0, 3], [1, 6], [2, 5], [4, 7]]
+
+    faces = [ [i for i in range(j,j+4)] for j in [0,2,4] ]
+    faces += [[0, 3, 4, 7], [1, 2, 5, 6], [0, 1, 6, 7]]
+
+    return dim, vertices, edges, faces
+
 def plot3D(quatHistory, title=''):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    vertices = np.array([[i,j,k] for i in [-1,1] for j in [-1,1] for k in [-1,1]])
-
-    edges = []
-
-    for i,v in enumerate(vertices):
-      for j,u in enumerate(vertices[i+1:]):
-        if np.linalg.norm(u-v) == 2:
-          edges.append([i,i+1+j])
+    dim, vertices, edges, faces = cube(750, np.array([900,800,600]))
 
     rotatedVertices = vertices.T
     lines = []
+
     for e in edges:
       l = np.array([ rotatedVertices[:,e[i]] for i in range(2) ]).T
       lines.append(ax.plot(*l))
 
-    ax.set_xlim([-4, 4])
-    ax.set_ylim([-4, 4])
-    ax.set_zlim([-4, 4])
+    d = np.linalg.norm(dim)
 
+    ax.set_xlim([-d/2, d/2])
+    ax.set_ylim([-d/2, d/2])
+    ax.set_zlim([-d/2, d/2])
+    ax.set_box_aspect([1,1,1])
 
-    q1 = np.array([3, 0, 0])
-    q2 = np.array([0, 3, 0])
-    q3 = np.array([0, 0, 3])
+    qv = 3*np.eye(3)
     center = np.zeros(3)
     quivers = []
-    for q,c in zip([q1, q2, q3], ['red', 'blue', 'green']):
+
+    for q,c in zip(qv, ['red', 'blue', 'green']):
       quivers.append(ax.quiver(*center, *q, color=c))
 
     for i in range(0, len(quatHistory), 25):
