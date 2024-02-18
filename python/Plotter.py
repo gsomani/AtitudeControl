@@ -60,9 +60,9 @@ def plot3D(quatHistory, title=''):
 
     d = np.linalg.norm(dim)
 
-    ax.set_xlim([-d/2, d/2])
-    ax.set_ylim([-d/2, d/2])
-    ax.set_zlim([-d/2, d/2])
+    for a in 'xyz':
+      getattr(ax, f'set_{a}lim')([-d/2, d/2])
+
     ax.set_box_aspect([1,1,1])
 
     qv = 3*np.eye(3)
@@ -70,20 +70,23 @@ def plot3D(quatHistory, title=''):
     quivers = []
 
     for q,c in zip(qv, ['red', 'blue', 'green']):
+      ax.quiver(*center, *q, color=c)
+
+    for q,c in zip(qv, ['red', 'blue', 'green']):
       quivers.append(ax.quiver(*center, *q, color=c))
 
     for i in range(0, len(quatHistory), 25):
-        rotationMatrix = quaternionToRotationMatrix(quatHistory[i])
-        rotatedVertices = rotationMatrix @ vertices.T
+      rotationMatrix = quaternionToRotationMatrix(quatHistory[i])
+      rotatedVertices = rotationMatrix @ vertices.T
 
-        # for q, point in zip(quivers, [q1, q2, q3]):
-        #   q.set_segments([list(center), list((rotationMatrix @ point.T).T)])
+      for q, point in zip(quivers, qv):
+         q.set_segments([[center, (rotationMatrix @ point.T)]])
 
-        for e,l in zip(edges,lines):
-            rl = np.array([ rotatedVertices[:,e[i]] for i in range(2) ]).T
-            l[0].set_data(*rl[:2])
-            l[0].set_3d_properties(rl[2])
+      for e,l in zip(edges,lines):
+          rl = np.array([ rotatedVertices[:,e[i]] for i in range(2) ]).T
+          l[0].set_data(*rl[:2])
+          l[0].set_3d_properties(rl[2])
 
-        plt.pause(0.1)
+      plt.pause(0.1)
 
     plt.show()
