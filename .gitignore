@@ -1,2 +1,5 @@
 *.png
+*.pdf
+*.npy
+*.mp4
 __pycache__

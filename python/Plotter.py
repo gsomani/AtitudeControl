@@ -13,7 +13,7 @@ def plotOmega(omegaHistory, title=''):
     plt.ylabel('Angular Velocity (rad/s)')
     plt.legend()
     plt.title(title)
-    plt.savefig(f'{title}-Omega')
+    plt.savefig(f'{title}')
     plt.show()
 
 def shapeFromInertia(mass, I):

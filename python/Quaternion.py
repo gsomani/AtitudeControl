@@ -14,32 +14,50 @@ def quaternionToRotationMatrix(q):
   return R
 
 def eulerToQuaternion(roll, pitch, yaw):
-    """
-    Converts ZYX Euler angles (in degrees) to a quaternion.
+  """
+  Converts ZYX Euler angles (in degrees) to a quaternion.
+  """
 
-    Returns:
-        numpy.ndarray: A quaternion in the form of [qw, qx, qy, qz].
-    """
+  r = np.deg2rad(roll)
+  p = np.deg2rad(pitch)
+  y = np.deg2rad(yaw)
 
-    r = np.deg2rad(roll)
-    p = np.deg2rad(pitch)
-    y = np.deg2rad(yaw)
+  # Calculate trigonometric components
+  c1 = np.cos(r/2)
+  c2 = np.cos(p/2)
+  c3 = np.cos(y/2)
+  s1 = np.sin(r/2)
+  s2 = np.sin(p/2)
+  s3 = np.sin(y/2)
 
-    # Calculate trigonometric components
-    c1 = np.cos(r/2)
-    c2 = np.cos(p/2)
-    c3 = np.cos(y/2)
-    s1 = np.sin(r/2)
-    s2 = np.sin(p/2)
-    s3 = np.sin(y/2)
+  # Construct the quaternion (scalar-last convention)
+  qw = c1*c2*c3 - s1*s2*s3
+  qx = s1*s2*c3 + c1*c2*s3
+  qy = s1*c2*c3 + c1*s2*s3
+  qz = c1*s2*c3 - s1*c2*s3
 
-    # Construct the quaternion (scalar-last convention)
-    qw = c1*c2*c3 - s1*s2*s3
-    qx = s1*s2*c3 + c1*c2*s3
-    qy = s1*c2*c3 + c1*s2*s3
-    qz = c1*s2*c3 - s1*c2*s3
+  return np.array([qw, qx, qy, qz])
 
-    return np.array([qw, qx, qy, qz])
+def quaternionToEuler(q):
+  """
+  Converts a quaternion to ZYX Euler angles (in radians).
+  """
+
+  qw, qx, qy, qz = q
+
+  # Avoid singularities near pitch +/- 90 degrees (Gimbal lock)
+  test = 2.0 * (qw*qy + qz*qx)
+  if test >= 1:
+    pitch = np.pi / 2
+  elif test <= -1:
+    pitch = -np.pi / 2
+  else:
+    pitch = np.arcsin(test)
+
+  roll = np.arctan2(2.0*(qw*qx + qy*qz), 1 - 2*(qx**2 + qy**2))
+  yaw = np.arctan2(2.0*(qw*qz + qx*qy), 1 - 2*(qy**2 + qz**2))
+
+  return roll, pitch, yaw
 
 def quaternionKinematics(q, omega):
   """

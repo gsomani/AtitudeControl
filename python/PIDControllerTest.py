@@ -22,6 +22,7 @@ class TestPIDController(unittest.TestCase):
         This test will change the attitude to a particular set point
         """
 
+        # Change these for different set points
         O1 = np.array([60, -30, -10])
         O2 = np.array([30, 30, 30])
         O3 = np.array([140, -80, 210])
@@ -37,7 +38,7 @@ class TestPIDController(unittest.TestCase):
         gyroscope = Gyroscope(self.I, gyroNoiseStd, omegaInit, self.torqueInit, self.dt)
 
         Kp = 20 * (self.I.diagonal()/np.max(self.I))
-        Ki = 0.1 * (self.I.diagonal()/np.max(self.I))
+        Ki = 0.4 * (self.I.diagonal()/np.max(self.I))
         Kd = 400 * (self.I.diagonal()/np.max(self.I))
         controller = PIDController(Kp, Ki, Kd, qInit, self.dt)
 
@@ -47,9 +48,9 @@ class TestPIDController(unittest.TestCase):
 
         realOrientation = self.simulate(desiredQ, qInit, gyroscope, controller, reactionWheel)
 
-        Plotter.plotOmega(np.array(gyroscope.omegaList), title='Omega')
-        Plotter.plotOmega(np.array(gyroscope.omegaNoisyList), title='OmegaNoisy')
-        #np.save('realOrientation', realOrientation)
+        Plotter.plotOmega(np.array(gyroscope.omegaList), title='Omega of the spacecraft')
+        Plotter.plotOmega(np.array(gyroscope.omegaNoisyList), title='GyroScope Data (With Gyro Noise)')
+        np.save('realOrientation', realOrientation)
         framesPerAngle = self.simTime/self.dt
         plotPyGame(realOrientation, np.insert(desiredOrientation, 0, np.zeros(3), axis=0), framesPerAngle)
         Plotter.plot3D(realOrientation)
