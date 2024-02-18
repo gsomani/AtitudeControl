@@ -48,5 +48,7 @@ class PIDController(object):
         plt.plot(self.errorVectorList[:, 1], label='Pitch')  # Plot pitch rate
         plt.plot(self.errorVectorList[:, 2], label='Yaw')  # Plot yaw rate
         plt.title('PID Error')
+        plt.ylabel('Quaternion Error Component')
+        plt.xlabel('Time (s)')
         plt.legend()
         plt.savefig(f'PID_Error')

@@ -4,7 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from Quaternion import quaternionToRotationMatrix
 
 def plotOmega(omegaHistory, title=''):
-    time = range(len(omegaHistory))
+    time = np.arange(0, len(omegaHistory)) * 0.01
     plt.figure()
     plt.plot(time, omegaHistory[:, 0], label='Roll')  # Plot roll rate
     plt.plot(time, omegaHistory[:, 1], label='Pitch')  # Plot pitch rate
