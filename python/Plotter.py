@@ -29,19 +29,20 @@ def hypercubeTraversal(n):
 def hyperCuboidTraversal(box):
     return np.array([[box[i][c] for i, c in enumerate(b)] for b in hypercubeTraversal(len(box))])
 
-def cube(mass, I):
+def cuboid(mass, I):
     dim = shapeFromInertia(mass, I)
+
+    cubeVertices = hypercubeTraversal(3)
     vertices = hyperCuboidTraversal([[-d/2,d/2] for d in dim])
 
-    edges = []
-    faces = [[] for j in range(6)]
-
     edges = [ [i,(i+1)%8] for i in range(8)]
-
     edges += [[0, 3], [1, 6], [2, 5], [4, 7]]
 
-    faces = [ [i for i in range(j,j+4)] for j in [0,2,4] ]
-    faces += [[0, 3, 4, 7], [1, 2, 5, 6], [0, 1, 6, 7]]
+    faces = [[[] for i in range(2)] for j in range(3)]
+
+    for i,v in enumerate(cubeVertices):
+      for j in range(3):
+        faces[j][v[j]].append(i)
 
     return dim, vertices, edges, faces
 
@@ -49,7 +50,7 @@ def plot3D(quatHistory, title=''):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    dim, vertices, edges, faces = cube(750, np.array([900,800,600]))
+    dim, vertices, edges, faces = cuboid(750, np.array([900,800,600]))
 
     rotatedVertices = vertices.T
     lines = []
