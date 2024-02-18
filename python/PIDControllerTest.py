@@ -2,8 +2,9 @@ import unittest
 import numpy as np
 from Dynamics import spacecraftDynamics
 from PIDController import PIDController
-from Quaternion import calculateCurrentOrientation
+from Quaternion import calculateCurrentOrientation, eulerToQuaternion
 import Plotter
+from PlotterPygame import plotPyGame
 from SensorAndActuatorModel import *
 
 class TestPIDController(unittest.TestCase):
@@ -12,7 +13,7 @@ class TestPIDController(unittest.TestCase):
         self.I = np.diag([900, 800, 600])
         self.torqueInit = np.array([0.0, 0.0, 0.0])  # No External Torque
         self.dt = 0.01
-        self.simTime = 500
+        self.simTime = 200
         self.rwMass = 1 #kg
         self.rwRadius = 0.5 #m
 
@@ -21,15 +22,18 @@ class TestPIDController(unittest.TestCase):
         This test will change the attitude to a particular set point
         """
 
+        O1 = np.array([60, -30, -10])
+        O2 = np.array([30, 30, 30])
+        O3 = np.array([140, -80, 210])
+
+        desiredOrientation = np.array([O1, O2, O3])
         # Desired quaternion
-        # qd = np.array([0.9961947, 0.0871557, 0, 0])
-        # qd = np.array([0.9437144, 0.1276794, 0.1448781, 0.2685358])
-        desiredQ = np.array([0.4821467, 0.2258942, 0.7239915, -0.4385689 ])
+        desiredQ = np.array([eulerToQuaternion(*o) for o in desiredOrientation])
 
         qInit = np.array([1.0, 0.0, 0.0, 0.0])  # Initial orientation
         omegaInit = np.array([0.0, 0.0, 0.0])
 
-        gyroNoiseStd = 0.0
+        gyroNoiseStd = 0.005
         gyroscope = Gyroscope(self.I, gyroNoiseStd, omegaInit, self.torqueInit, self.dt)
 
         Kp = 20 * (self.I.diagonal()/np.max(self.I))
@@ -45,7 +49,8 @@ class TestPIDController(unittest.TestCase):
 
         Plotter.plotOmega(np.array(gyroscope.omegaList), title='Omega')
         Plotter.plotOmega(np.array(gyroscope.omegaNoisyList), title='OmegaNoisy')
-        np.save('realOrientation', realOrientation)
+        #np.save('realOrientation', realOrientation)
+        plotPyGame(realOrientation)
         Plotter.plot3D(realOrientation)
 
     def simulate(self, desiredQ, initialQ, gyro, controller, reactionwheel):
@@ -53,10 +58,12 @@ class TestPIDController(unittest.TestCase):
         Simulates spacecraft dynamics and pid control.
         """
         realOrientation = [initialQ]
+        nD = len(desiredQ)
 
-        for t in np.arange(self.dt, self.simTime, self.dt):
+        for t in np.arange(self.dt, self.simTime*nD, self.dt):
+            qd = desiredQ[int(t // self.simTime)]
             omegaReading = gyro()
-            controlTorque = controller(desiredQ, omegaReading)
+            controlTorque = controller(qd, omegaReading)
             actualTorque = reactionwheel(controlTorque)
 
             gyro.simulateRotation(actualTorque)
