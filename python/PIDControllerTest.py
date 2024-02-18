@@ -43,7 +43,10 @@ class TestPIDController(unittest.TestCase):
 
         realOrientation = self.simulate(desiredQ, qInit, gyroscope, controller, reactionWheel)
 
-        Plotter.plot(np.array(gyroscope.omegaList), realOrientation, title='PID')
+        Plotter.plotOmega(np.array(gyroscope.omegaList), title='Omega')
+        Plotter.plotOmega(np.array(gyroscope.omegaNoisyList), title='OmegaNoisy')
+        np.save('realOrientation', realOrientation)
+        Plotter.plot3D(realOrientation)
 
     def simulate(self, desiredQ, initialQ, gyro, controller, reactionwheel):
         """

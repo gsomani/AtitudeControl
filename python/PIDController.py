@@ -20,6 +20,7 @@ class PIDController(object):
 
     def __call__(self, desiredQ, omega):
         currentQ = calculateCurrentOrientation(self.quatList[-1], omega, self.dt)
+        self.quatList.append(currentQ)
         qe = calculateQuatError(desiredQ, currentQ)
 
         errorVector = extractErrorVector(qe)
