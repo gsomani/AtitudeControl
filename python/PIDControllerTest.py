@@ -50,7 +50,8 @@ class TestPIDController(unittest.TestCase):
         Plotter.plotOmega(np.array(gyroscope.omegaList), title='Omega')
         Plotter.plotOmega(np.array(gyroscope.omegaNoisyList), title='OmegaNoisy')
         #np.save('realOrientation', realOrientation)
-        plotPyGame(realOrientation)
+        framesPerAngle = self.simTime/self.dt
+        plotPyGame(realOrientation, np.insert(desiredOrientation, 0, np.zeros(3), axis=0), framesPerAngle)
         Plotter.plot3D(realOrientation)
 
     def simulate(self, desiredQ, initialQ, gyro, controller, reactionwheel):

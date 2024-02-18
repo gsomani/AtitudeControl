@@ -13,6 +13,34 @@ def quaternionToRotationMatrix(q):
   ])
   return R
 
+def eulerToQuaternion(roll, pitch, yaw):
+    """
+    Converts ZYX Euler angles (in degrees) to a quaternion.
+
+    Returns:
+        numpy.ndarray: A quaternion in the form of [qw, qx, qy, qz].
+    """
+
+    r = np.deg2rad(roll)
+    p = np.deg2rad(pitch)
+    y = np.deg2rad(yaw)
+
+    # Calculate trigonometric components
+    c1 = np.cos(r/2)
+    c2 = np.cos(p/2)
+    c3 = np.cos(y/2)
+    s1 = np.sin(r/2)
+    s2 = np.sin(p/2)
+    s3 = np.sin(y/2)
+
+    # Construct the quaternion (scalar-last convention)
+    qw = c1*c2*c3 - s1*s2*s3
+    qx = s1*s2*c3 + c1*c2*s3
+    qy = s1*c2*c3 + c1*s2*s3
+    qz = c1*s2*c3 - s1*c2*s3
+
+    return np.array([qw, qx, qy, qz])
+
 def quaternionKinematics(q, omega):
   """
   Calculates quaternion derivative (qdot) based on angular velocity.
