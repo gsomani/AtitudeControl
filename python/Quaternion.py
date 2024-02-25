@@ -13,7 +13,7 @@ class Quaternion:
   def __mul__(self, q):
     if type(q) == float or type(q) == int:
       w,v = self.w*q, self.v*q
-    else: 
+    else:
       w = self.w*q.w - np.dot(self.v,q.v)
       v = self.w*q.v + q.w*self.v + np.cross(self.v,q.v)
     return Quaternion(w,v)
@@ -28,7 +28,7 @@ class Quaternion:
     return "%f + %f i + %f j + %f k" %(self.w,*self.v)
 
   def derivative(self, omega):
-    return self*Quaternion(0,omega/2) 
+    return self*Quaternion(0,omega/2)
 
   def rotationMatrix(self):
     R = np.empty([3,3])
@@ -43,21 +43,12 @@ class Quaternion:
 
 def quaternionToRotationMatrix(qq):
   q = Quaternion(qq[0], np.array(qq[1:]))
-  R = np.empty([3,3])
-
-  for i in range(3):
-    R[i,i] = 2*(q.w*q.w + q.v[i]*q.v[i]) - 1
-    j,k = [(i+m) % 3 for m in range(1,3)]
-    R[i,j] = 2*(q.v[j]*q.v[i] - q.w*q.v[k])
-    R[i,k] = 2*(q.v[k]*q.v[i] + q.w*q.v[j])
-
-  return R
+  return q.rotationMatrix()
 
 def eulerToQuaternion(roll, pitch, yaw):
   """
   Converts ZYX Euler angles (in degrees) to a quaternion.
   """
-
   r = np.deg2rad(roll)
   p = np.deg2rad(pitch)
   y = np.deg2rad(yaw)
@@ -130,5 +121,5 @@ def calculateQuatError(desiredQ, currentQ):
   return quaternionMultiply(quaternionInverse(desiredQ), currentQ)
 
 def extractErrorVector(qe):
-    """Takes an error quaternion (qe) and extracts the vector part."""
-    return qe[1:]
+  """Takes an error quaternion (qe) and extracts the vector part."""
+  return qe[1:]

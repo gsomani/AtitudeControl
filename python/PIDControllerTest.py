@@ -1,11 +1,10 @@
 import unittest
 import numpy as np
-from Dynamics import spacecraftDynamics
 from PIDController import PIDController
 from Quaternion import calculateCurrentOrientation, eulerToQuaternion
 import Plotter
 from PlotterPygame import plotPyGame
-from SensorAndActuatorModel import *
+from SensorAndActuatorModel import Gyroscope, ReactionWheel
 
 class TestPIDController(unittest.TestCase):
 

@@ -51,4 +51,4 @@ class PIDController(object):
         plt.ylabel('Quaternion Error Component')
         plt.xlabel('Time (s)')
         plt.legend()
-        plt.savefig(f'PID_Error')
+        plt.savefig('PID_Error')

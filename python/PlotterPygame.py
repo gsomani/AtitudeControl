@@ -20,7 +20,6 @@ os.makedirs(FOLDER, exist_ok=True)
 
 def plotPyGame(data, angles='', framesPerAngle=''):
   window = pygame.display.set_mode( (WINDOW_SIZE, WINDOW_SIZE) )
-  clock = pygame.time.Clock()
 
   dim, vertices, edges, faces = cuboid(750, np.array([900,800,600]))
 
