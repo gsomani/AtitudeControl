@@ -1,16 +1,56 @@
 import numpy as np
 
-def quaternionToRotationMatrix(q):
-  """
-  Calculates rotation matrix from a quaternion.
-  """
-  qw, qx, qy, qz = q
+class Quaternion:
+  def __init__(self, w, v):
+    self.w = w
+    self.v = np.array(v)
 
-  R = np.array([
-      [1 - 2*qy**2 - 2*qz**2, 2*qx*qy - 2*qz*qw, 2*qx*qz + 2*qy*qw],
-      [2*qx*qy + 2*qz*qw, 1 - 2*qx**2 - 2*qz**2, 2*qy*qz - 2*qx*qw],
-      [2*qx*qz - 2*qy*qw, 2*qy*qz + 2*qx*qw, 1 - 2*qx**2 - 2*qy**2]
-  ])
+  def __add__(self, q):
+    w = self.w + q.w
+    v = self.v + q.v
+    return Quaternion(w,v)
+
+  def __mul__(self, q):
+    if type(q) == float or type(q) == int:
+      w,v = self.w*q, self.v*q
+    else: 
+      w = self.w*q.w - np.dot(self.v,q.v)
+      v = self.w*q.v + q.w*self.v + np.cross(self.v,q.v)
+    return Quaternion(w,v)
+
+  def __sub__(self, q):
+    return self + (-q)
+
+  def __neg__(self):
+    return Quaternion(-self.w, -self.v)
+
+  def __repr__(self):
+    return "%f + %f i + %f j + %f k" %(self.w,*self.v)
+
+  def derivative(self, omega):
+    return self*Quaternion(0,omega/2) 
+
+  def rotationMatrix(self):
+    R = np.empty([3,3])
+
+    for i in range(3):
+      R[i,i] = 2*(self.w*self.w + self.v[i]*self.v[i]) - 1
+      j,k = [(i+m) % 3 for m in range(1,3)]
+      R[i,j] = 2*(self.v[j]*self.v[i] - self.w*self.v[k])
+      R[i,k] = 2*(self.v[k]*self.v[i] + self.w*self.v[j])
+
+    return R
+
+def quaternionToRotationMatrix(qq):
+  q = Quaternion(qq[0], np.array(qq[1:]))
+  R = np.empty([3,3])
+
+  for i in range(3):
+    R[i,i] = 2*(q.w*q.w + q.v[i]*q.v[i]) - 1
+    j,k = [(i+m) % 3 for m in range(1,3)]
+    R[i,j] = 2*(q.v[j]*q.v[i] - q.w*q.v[k])
+    R[i,k] = 2*(q.v[k]*q.v[i] + q.w*q.v[j])
+
   return R
 
 def eulerToQuaternion(roll, pitch, yaw):
@@ -60,19 +100,9 @@ def quaternionToEuler(q):
   return roll, pitch, yaw
 
 def quaternionKinematics(q, omega):
-  """
-  Calculates quaternion derivative (qdot) based on angular velocity.
-  """
-  qw, qx, qy, qz = q
-  wx, wy, wz = omega
-
-  qdot = np.zeros_like(q)  # Initialize qdot array
-  qdot[0] = 0.5 * (-qx * wx - qy * wy - qz * wz)  # Scalar part
-  qdot[1] = 0.5 * (qw * wx + qy * wz - qz * wy)  # Vector part
-  qdot[2] = 0.5 * (qw * wy - qx * wz + qz * wx)
-  qdot[3] = 0.5 * (qw * wz + qx * wy - qy * wx)
-
-  return qdot
+  qq = Quaternion(q[0],np.array(q[1:]))
+  qdot = qq.derivative(omega)
+  return np.array([qdot.w, *qdot.v])
 
 def quaternionInverse(q):
   """Calculates the inverse of a quaternion."""
@@ -81,15 +111,11 @@ def quaternionInverse(q):
 
 def quaternionMultiply(q1, q2):
   """Performs quaternion multiplication."""
-  w1, x1, y1, z1 = q1
-  w2, x2, y2, z2 = q2
+  q = [ Quaternion(a[0],np.array(a[1:])) for a in [q1,q2]]
 
-  w = w1*w2 - x1*x2 - y1*y2 - z1*z2
-  x = w1*x2 + x1*w2 + y1*z2 - z1*y2
-  y = w1*y2 + y1*w2 + z1*x2 - x1*z2
-  z = w1*z2 + z1*w2 + x1*y2 - y1*x2
+  p = q[0]*q[1]
 
-  return np.array([w, x, y, z])
+  return np.array([p.w, *p.v])
 
 def calculateCurrentOrientation(previousQ, omega, dt):
   qdot = quaternionKinematics(previousQ, omega)

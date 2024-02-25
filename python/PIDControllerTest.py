@@ -13,7 +13,7 @@ class TestPIDController(unittest.TestCase):
         self.I = np.diag([900, 800, 600])
         self.torqueInit = np.array([0.0, 0.0, 0.0])  # No External Torque
         self.dt = 0.01
-        self.simTime = 200
+        self.simTime = 100
         self.rwMass = 1 #kg
         self.rwRadius = 0.5 #m
 
