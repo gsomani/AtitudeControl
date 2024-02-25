@@ -1,11 +1,10 @@
 import unittest
 import numpy as np
-from Dynamics import spacecraftDynamics
 from PIDController import PIDController
 from Quaternion import calculateCurrentOrientation, eulerToQuaternion
 import Plotter
 from PlotterPygame import plotPyGame
-from SensorAndActuatorModel import *
+from SensorAndActuatorModel import Gyroscope, ReactionWheel
 
 class TestPIDController(unittest.TestCase):
 
@@ -13,7 +12,7 @@ class TestPIDController(unittest.TestCase):
         self.I = np.diag([900, 800, 600])
         self.torqueInit = np.array([0.0, 0.0, 0.0])  # No External Torque
         self.dt = 0.01
-        self.simTime = 200
+        self.simTime = 100
         self.rwMass = 1 #kg
         self.rwRadius = 0.5 #m
 
@@ -22,6 +21,7 @@ class TestPIDController(unittest.TestCase):
         This test will change the attitude to a particular set point
         """
 
+        # Change these for different set points
         O1 = np.array([60, -30, -10])
         O2 = np.array([30, 30, 30])
         O3 = np.array([140, -80, 210])
@@ -37,7 +37,7 @@ class TestPIDController(unittest.TestCase):
         gyroscope = Gyroscope(self.I, gyroNoiseStd, omegaInit, self.torqueInit, self.dt)
 
         Kp = 20 * (self.I.diagonal()/np.max(self.I))
-        Ki = 0.1 * (self.I.diagonal()/np.max(self.I))
+        Ki = 0.4 * (self.I.diagonal()/np.max(self.I))
         Kd = 400 * (self.I.diagonal()/np.max(self.I))
         controller = PIDController(Kp, Ki, Kd, qInit, self.dt)
 
@@ -47,10 +47,11 @@ class TestPIDController(unittest.TestCase):
 
         realOrientation = self.simulate(desiredQ, qInit, gyroscope, controller, reactionWheel)
 
-        Plotter.plotOmega(np.array(gyroscope.omegaList), title='Omega')
-        Plotter.plotOmega(np.array(gyroscope.omegaNoisyList), title='OmegaNoisy')
-        #np.save('realOrientation', realOrientation)
-        plotPyGame(realOrientation)
+        Plotter.plotOmega(np.array(gyroscope.omegaList), title='Omega of the spacecraft')
+        Plotter.plotOmega(np.array(gyroscope.omegaNoisyList), title='GyroScope Data (With Gyro Noise)')
+        np.save('realOrientation', realOrientation)
+        framesPerAngle = self.simTime/self.dt
+        plotPyGame(realOrientation, np.insert(desiredOrientation, 0, np.zeros(3), axis=0), framesPerAngle)
         Plotter.plot3D(realOrientation)
 
     def simulate(self, desiredQ, initialQ, gyro, controller, reactionwheel):

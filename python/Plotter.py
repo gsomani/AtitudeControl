@@ -1,11 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 from Quaternion import quaternionToRotationMatrix
 from itertools import chain
 
 def plotOmega(omegaHistory, title=''):
-    time = range(len(omegaHistory))
+    time = np.arange(0, len(omegaHistory)) * 0.01
     plt.figure()
     plt.plot(time, omegaHistory[:, 0], label='Roll')  # Plot roll rate
     plt.plot(time, omegaHistory[:, 1], label='Pitch')  # Plot pitch rate
@@ -14,7 +13,7 @@ def plotOmega(omegaHistory, title=''):
     plt.ylabel('Angular Velocity (rad/s)')
     plt.legend()
     plt.title(title)
-    plt.savefig(f'{title}-Omega')
+    plt.savefig(f'{title}')
     plt.show()
 
 def shapeFromInertia(mass, I):

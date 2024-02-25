@@ -1,7 +1,6 @@
 import unittest
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 from Dynamics import spacecraftDynamics
 from Quaternion import quaternionToRotationMatrix
 
@@ -14,29 +13,11 @@ class TestSpacecraftDynamics(unittest.TestCase):
         self.dt = 0.01
         self.simTime = 100
 
-    '''
-    def testZeroTorque(self):
-        T = np.array([0.0, 0.0, 0.0])
-
-        omegaHistory, quatHistory = self.simulate(T)
-        self.plot(omegaHistory, quatHistory, 'Zero-Torque')
-
-        # Assertions
-        # maxDeviation = 0.01  # Adjust tolerance as needed
-        # self.assertTrue(np.all(np.abs(omegaInit - omegaHistory[-1]) < maxDeviation))
-
-    '''
-
     def tesConstantTorque(self): # In one axis
         T = np.array([2.0, 0.0, 0.0])
 
         omegaHistory, quatHistory = self.simulate(T)
         self.plot(omegaHistory, quatHistory, 'Constant-Torque')
-
-        # Assertions
-        # maxDeviation = 0.01  # Adjust tolerance as needed
-        # self.assertTrue(np.all(np.abs(omegaInit - omegaHistory[-1]) < maxDeviation))
-
 
     def testTwoAxisConstantTorque(self):
         T = np.array([2.0, 2.0, 0.0])
@@ -79,8 +60,6 @@ class TestSpacecraftDynamics(unittest.TestCase):
         ax.set_ylim([-2, 2])
         ax.set_zlim([-2, 2])
 
-        steps = 100
-        print(quatHistory)
         for i in range(0, len(time),50):
             rotationMatrix = quaternionToRotationMatrix(quatHistory[i])
             rotatedVertices = rotationMatrix @ vertices.T
