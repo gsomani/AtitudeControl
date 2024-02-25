@@ -11,7 +11,7 @@ class Quaternion:
     return Quaternion(w,v)
 
   def __mul__(self, q):
-    if type(q) == float or type(q) == int:
+    if type(q) in [float, int, np.float64] :
       w,v = self.w*q, self.v*q
     else:
       w = self.w*q.w - np.dot(self.v,q.v)
@@ -24,12 +24,19 @@ class Quaternion:
   def __neg__(self):
     return Quaternion(-self.w, -self.v)
 
+  def __eq__(self, other):
+    if not isinstance(other, Quaternion):
+        return NotImplemented
+
+    return (other.w == self.w and other.v == self.v)
+
   def __repr__(self):
     return "%f + %f i + %f j + %f k" %(self.w,*self.v)
 
   def derivative(self, omega):
     return self*Quaternion(0,omega/2)
 
+  @property
   def rotationMatrix(self):
     R = np.empty([3,3])
 
@@ -41,9 +48,22 @@ class Quaternion:
 
     return R
 
+  @property
+  def norm(self):
+    return np.linalg.norm([self.w, *self.v])
+
+  def normalise(self):
+    self = self*(1/self.norm)
+
+  def update(self, omega, dt):
+    qdot = self.derivative(omega)
+    q = self + qdot*dt
+    q.normalise()
+    return q
+
 def quaternionToRotationMatrix(qq):
   q = Quaternion(qq[0], np.array(qq[1:]))
-  return q.rotationMatrix()
+  return q.rotationMatrix
 
 def eulerToQuaternion(roll, pitch, yaw):
   """
@@ -90,11 +110,6 @@ def quaternionToEuler(q):
 
   return roll, pitch, yaw
 
-def quaternionKinematics(q, omega):
-  qq = Quaternion(q[0],np.array(q[1:]))
-  qdot = qq.derivative(omega)
-  return np.array([qdot.w, *qdot.v])
-
 def quaternionInverse(q):
   """Calculates the inverse of a quaternion."""
   norm_squared = np.sum(q**2)
@@ -109,12 +124,9 @@ def quaternionMultiply(q1, q2):
   return np.array([p.w, *p.v])
 
 def calculateCurrentOrientation(previousQ, omega, dt):
-  qdot = quaternionKinematics(previousQ, omega)
-  q = previousQ + qdot * dt  # (Assume simple Euler integration for now)
-
-  # Normalize quaternion
-  q = q / np.linalg.norm(q)
-  return q
+  Q = Quaternion(previousQ[0], previousQ[1:])
+  q = Q.update(omega, dt)
+  return np.array([q.w,*q.v])
 
 def calculateQuatError(desiredQ, currentQ):
   """Calculates error quaternion (qe = desiredQ^-1 * currentQ)."""
