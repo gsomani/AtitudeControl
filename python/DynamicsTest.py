@@ -1,9 +1,8 @@
 import unittest
 import numpy as np
-import matplotlib.pyplot as plt
 from Dynamics import angularAcceleration
 import Plotter
-from Quaternion import quaternionToRotationMatrix, calculateCurrentOrientation
+from Quaternion import calculateCurrentOrientation
 
 class TestSpacecraftDynamics(unittest.TestCase):
 
