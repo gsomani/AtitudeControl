@@ -1,6 +1,5 @@
 import numpy as np
-from Dynamics import spacecraftDynamics
-
+from Dynamics import angularAcceleration
 
 class Gyroscope(object):
     def __init__(self, I, noiseStd=0.01, initialOmega=np.zeros(3), initialTorque=np.zeros(3), dt=0.01): # holdCount=80, initialShift=10, dropCount=8):
@@ -16,7 +15,7 @@ class Gyroscope(object):
         self.torque = torque
 
     def __call__(self):
-        omegadot = spacecraftDynamics(self.torque, self.omegaList[-1], self.I)
+        omegadot = angularAcceleration(self.torque, self.omegaList[-1], self.I)
 
         omega = self.omegaList[-1] + omegadot * self.dt
         omegaNoisy = omega + np.random.randn(3) * self.noiseStd
