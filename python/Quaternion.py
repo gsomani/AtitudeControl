@@ -73,6 +73,10 @@ class Quaternion:
   def angle(self):
     return 2*np.arctan2(self.linalg.norm(self.v), self.w)
 
+  @property
+  def inverse(self):
+    return (self.conj)*(1/(self.norm**2))
+
 def fromAxisAngle(angle, axis):
   z = np.exp(1j*np.deg2rad(angle/2))
   axis /= np.linalg.norm(axis)
@@ -123,19 +127,11 @@ def quaternionToEuler(q):
 
   return roll, pitch, yaw
 
-def quaternionInverse(q):
-  """Calculates the inverse of a quaternion."""
-  norm_squared = q.norm**2
-  return q.conj *(1/ norm_squared)
-
 def calculateCurrentOrientation(previousQ, omega, dt):
   return previousQ.update(omega, dt)
 
 def calculateQuatError(desiredQ, currentQ):
-  """Calculates error quaternion (qe = desiredQ^-1 * currentQ)."""
-  qI = quaternionInverse(desiredQ)
-  return qI * currentQ
+  return desiredQ.inverse * currentQ
 
 def extractErrorVector(qe):
-  """Takes an error quaternion (qe) and extracts the vector part."""
   return qe.v
