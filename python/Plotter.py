@@ -77,7 +77,7 @@ def plot3D(quatHistory, title=''):
       quivers.append(ax.quiver(*center, *q, color=c))
 
     for i in range(0, len(quatHistory), 25):
-      rotationMatrix = quaternionToRotationMatrix(quatHistory[i])
+      rotationMatrix = quatHistory[i].rotationMatrix
       rotatedVertices = rotationMatrix @ vertices.T
 
       for q, point in zip(quivers, qv):

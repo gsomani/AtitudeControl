@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from PIDController import PIDController
-from Quaternion import calculateCurrentOrientation, eulerToQuaternion
+from Quaternion import calculateCurrentOrientation, eulerToQuaternion, Quaternion
 import Plotter
 from PlotterPygame import plotPyGame
 from SensorAndActuatorModel import Gyroscope, ReactionWheel
@@ -29,6 +29,7 @@ class TestPIDController(unittest.TestCase):
     desiredOrientation = np.array([O1, O2, O3])
     # Desired quaternion
     desiredQ = np.array([eulerToQuaternion(*o) for o in desiredOrientation])
+    desiredQ = [Quaternion(d[0],d[1:]) for d in desiredQ]
 
     qInit = np.array([1.0, 0.0, 0.0, 0.0])  # Initial orientation
     omegaInit = np.array([0.0, 0.0, 0.0])
@@ -58,7 +59,7 @@ class TestPIDController(unittest.TestCase):
     """
     Simulates spacecraft dynamics and pid control.
     """
-    realOrientation = [initialQ]
+    realOrientation = [Quaternion(initialQ[0],initialQ[1:])]
     nD = len(desiredQ)
 
     for t in np.arange(self.dt, self.simTime*nD, self.dt):

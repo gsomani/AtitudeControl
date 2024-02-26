@@ -1,7 +1,6 @@
 import pygame
 import numpy as np
 from math import *
-from Quaternion import quaternionToRotationMatrix
 from Plotter import cuboid
 import os
 
@@ -31,7 +30,7 @@ def plotPyGame(data, angles='', framesPerAngle=''):
     window.fill((0,0,0))
 
     # Drawing Cuboid
-    r = quaternionToRotationMatrix(point)
+    r = point.rotationMatrix
     rotatedVertices = (r @ vertices.T).T
     rotatedVertices = (rotatedVertices * scale) + WINDOW_SIZE/2
 

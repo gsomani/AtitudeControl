@@ -1,5 +1,5 @@
 import numpy as np
-from Quaternion import calculateQuatError, extractErrorVector, calculateCurrentOrientation
+from Quaternion import calculateQuatError, extractErrorVector, calculateCurrentOrientation, Quaternion
 import matplotlib.pyplot as plt
 
 
@@ -9,7 +9,7 @@ class PIDController(object):
         self.integral = np.zeros(3)
         self.prevErrorVector = np.zeros(3)
         self.errorVectorList = []
-        self.quatList = [initialOrientation]
+        self.quatList = [Quaternion(initialOrientation[0],initialOrientation[1:])]
         self.dt = dt
         # self.n = 0
         # self.m = 0
