@@ -125,22 +125,17 @@ def quaternionToEuler(q):
 
 def quaternionInverse(q):
   """Calculates the inverse of a quaternion."""
-  norm_squared = np.sum(q**2)
-  qI = Quaternion(q[0],q[1:]).conj
-  return np.array([qI.w, *qI.v]) / norm_squared
+  norm_squared = q.norm**2
+  return q.conj *(1/ norm_squared)
 
 def calculateCurrentOrientation(previousQ, omega, dt):
-  Q = Quaternion(previousQ[0], previousQ[1:])
-  q = Q.update(omega, dt)
-  return np.array([q.w,*q.v])
+  return previousQ.update(omega, dt)
 
 def calculateQuatError(desiredQ, currentQ):
   """Calculates error quaternion (qe = desiredQ^-1 * currentQ)."""
   qI = quaternionInverse(desiredQ)
-
-  q = Quaternion(qI[0],qI[1:]) * Quaternion(currentQ[0], currentQ[1:])
-  return np.array([q.w, *q.v])
+  return qI * currentQ
 
 def extractErrorVector(qe):
   """Takes an error quaternion (qe) and extracts the vector part."""
-  return qe[1:]
+  return qe.v

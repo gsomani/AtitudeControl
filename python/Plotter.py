@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from Quaternion import Quaternion
 
 def plotOmega(omegaHistory, title=''):
     time = np.arange(0, len(omegaHistory)) * 0.01
@@ -76,8 +75,7 @@ def plot3D(quatHistory, title=''):
       quivers.append(ax.quiver(*center, *q, color=c))
 
     for i in range(0, len(quatHistory), 25):
-      q = Quaternion(quatHistory[i][0], quatHistory[i][1:])
-      rotationMatrix = q.rotationMatrix
+      rotationMatrix = quatHistory[i].rotationMatrix
       rotatedVertices = rotationMatrix @ vertices.T
 
       for q, point in zip(quivers, qv):
