@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from Quaternion import quaternionToRotationMatrix
 from itertools import chain
 
 def plotOmega(omegaHistory, title=''):
