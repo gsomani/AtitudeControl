@@ -129,9 +129,3 @@ def quaternionToEuler(q):
 
 def calculateCurrentOrientation(previousQ, omega, dt):
   return previousQ.update(omega, dt)
-
-def calculateQuatError(desiredQ, currentQ):
-  return desiredQ.inverse * currentQ
-
-def extractErrorVector(qe):
-  return qe.v
