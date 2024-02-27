@@ -90,5 +90,3 @@ def plot3D(quatHistory, title=''):
       plt.pause(0.1)
 
     plt.show()
-
-print(cuboid(750, np.array([900,800,600])))
