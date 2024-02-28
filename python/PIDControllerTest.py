@@ -27,9 +27,7 @@ class TestPIDController(unittest.TestCase):
     O3 = np.array([140, -80, 210])
 
     desiredOrientation = np.array([O1, O2, O3])
-    # Desired quaternion
     desiredQ = np.array([eulerToQuaternion(*o) for o in desiredOrientation])
-    desiredQ = [Quaternion(d[0],d[1:]) for d in desiredQ]
 
     qInit = np.array([1.0, 0.0, 0.0, 0.0])  # Initial orientation
     omegaInit = np.array([0.0, 0.0, 0.0])
@@ -63,14 +61,14 @@ class TestPIDController(unittest.TestCase):
     nD = len(desiredQ)
 
     for t in np.arange(self.dt, self.simTime*nD, self.dt):
-        qd = desiredQ[int(t // self.simTime)]
-        omegaReading = gyro()
-        controlTorque = controller(qd, omegaReading)
-        actualTorque = reactionwheel(controlTorque)
+      qd = desiredQ[int(t // self.simTime)]
+      omegaReading = gyro()
+      controlTorque = controller(qd, omegaReading)
+      actualTorque = reactionwheel(controlTorque)
 
-        gyro.simulateRotation(actualTorque)
+      gyro.simulateRotation(actualTorque)
 
-        realOrientation.append(calculateCurrentOrientation(realOrientation[-1], gyro.omegaList[-1], gyro.dt))
+      realOrientation.append(calculateCurrentOrientation(realOrientation[-1], gyro.omegaList[-1], gyro.dt))
 
     controller.plot()
     return np.array(realOrientation)
