@@ -3,12 +3,12 @@ import numpy as np
 from PIDController import PIDController
 from Quaternion import calculateCurrentOrientation, eulerToQuaternion, Quaternion
 import Plotter
-from PlotterPygame import plotPyGame
 from SensorAndActuatorModel import Gyroscope, ReactionWheel
 
 class TestPIDController(unittest.TestCase):
 
   def setUp(self):
+      self.mass = 750
       self.I = np.diag([900, 800, 600])
       self.torqueInit = np.array([0.0, 0.0, 0.0])  # No External Torque
       self.dt = 0.01
@@ -23,10 +23,8 @@ class TestPIDController(unittest.TestCase):
 
     # Change these for different set points
     O1 = np.array([60, -30, -10])
-    O2 = np.array([30, 30, 30])
-    O3 = np.array([140, -80, 210])
 
-    desiredOrientation = np.array([O1, O2, O3])
+    desiredOrientation = np.array([O1])
     desiredQ = np.array([eulerToQuaternion(*o) for o in desiredOrientation])
 
     qInit = np.array([1.0, 0.0, 0.0, 0.0])  # Initial orientation
@@ -49,9 +47,7 @@ class TestPIDController(unittest.TestCase):
     Plotter.plotOmega(np.array(gyroscope.omegaList), title='Omega of the spacecraft')
     Plotter.plotOmega(np.array(gyroscope.omegaNoisyList), title='GyroScope Data (With Gyro Noise)')
     np.save('realOrientation', realOrientation)
-    framesPerAngle = self.simTime/self.dt
-    plotPyGame(realOrientation, np.insert(desiredOrientation, 0, np.zeros(3), axis=0), framesPerAngle)
-    Plotter.plot3D(realOrientation)
+    Plotter.plot3D(realOrientation, self.mass, self.I)
 
   def simulate(self, desiredQ, initialQ, gyro, controller, reactionwheel):
     """
