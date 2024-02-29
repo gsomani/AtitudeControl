@@ -7,6 +7,7 @@ from Quaternion import Quaternion
 class TestSpacecraftDynamics(unittest.TestCase):
 
   def setUp(self):
+    self.mass = 750
     self.I = np.diag([900, 800, 600])
     self.qInit = Quaternion(1,np.array([ 0.0, 0.0, 0.0]))  # Initial orientation
     self.omegaInit = np.array([0.0, 0.0, 0.0])
@@ -17,12 +18,12 @@ class TestSpacecraftDynamics(unittest.TestCase):
     T = np.array([2.0, 0.0, 0.0])
 
     quatHistory = self.simulate(T)
-    Plotter.plot3D(quatHistory)
+    Plotter.plot3D(quatHistory, self.mass, self.I)
 
   def testTwoAxisConstantTorque(self):
     T = np.array([2.0, 2.0, 0.0])
     quatHistory = self.simulate(T)
-    Plotter.plot3D(quatHistory)
+    Plotter.plot3D(quatHistory, self.mass, self.I)
 
   def simulate(self, T):
     omega = self.omegaInit

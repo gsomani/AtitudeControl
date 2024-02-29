@@ -1,7 +1,7 @@
 import numpy as np
 
 class Quaternion:
-  def __init__(self, w, v):
+  def __init__(self, w, v = np.array([0,0,0])):
     self.w = w
     self.v = np.array(v)
 

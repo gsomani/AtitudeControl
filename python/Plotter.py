@@ -44,11 +44,11 @@ def cuboid(mass, I):
 
   return dim, vertices, list(chain(*(chain(*edges)))), list(chain(*faces))
 
-def plot3D(quatHistory, title=''):
+def plot3D(quatHistory, mass, I, title=''):
   fig = plt.figure()
   ax = fig.add_subplot(111, projection='3d')
 
-  dim, vertices, edges, faces = cuboid(750, np.array([900,800,600]))
+  dim, vertices, edges, faces = cuboid(mass, np.array([I[i,i] for i in range(3)]))
 
   rotatedVertices = vertices.T
   lines = []
