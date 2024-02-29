@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from itertools import chain
 
 def plotOmega(omegaHistory, title=''):
   time = np.arange(0, len(omegaHistory)) * 0.01
@@ -33,16 +34,15 @@ def cuboid(mass, I):
   cubeVertices = hypercubeTraversal(3)
   vertices = hyperCuboidTraversal([[-d/2,d/2] for d in dim])
 
-  edges = [ [i,(i+1)%8] for i in range(8)]
-  edges += [[0, 3], [1, 6], [2, 5], [4, 7]]
-
   faces = [[[] for i in range(2)] for j in range(3)]
+  edges = [[[[] for i in range(2)] for j in range(2)] for k in range(3)]
 
   for i,v in enumerate(cubeVertices):
     for j in range(3):
       faces[j][v[j]].append(i)
+      edges[j][v[(j+1)%3]][v[(j+2)%3]].append(i)
 
-  return dim, vertices, edges, faces
+  return dim, vertices, list(chain(*(chain(*edges)))), list(chain(*faces))
 
 def plot3D(quatHistory, mass, I, title=''):
   fig = plt.figure()

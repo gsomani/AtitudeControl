@@ -32,7 +32,6 @@ class TestSpacecraftDynamics(unittest.TestCase):
     for t in np.arange(self.dt, self.simTime, self.dt):
       omega, q = update(quatHistory[-1], T, omega, self.I, self.dt)
       quatHistory.append(q)
-
     return np.array(quatHistory)
 
 
