@@ -17,17 +17,11 @@ class TestPIDController(unittest.TestCase):
       self.rwRadius = 0.5 #m
 
   def test1(self):
-    """
-    This test will change the attitude to a particular set point
-    """
-
-    # Change these for different set points
     O1 = np.array([60, -30, -10])
 
     desiredOrientation = np.array([O1])
     desiredQ = np.array([eulerToQuaternion(*o) for o in desiredOrientation])
 
-    qInit = np.array([1.0, 0.0, 0.0, 0.0])  # Initial orientation
     omegaInit = np.array([0.0, 0.0, 0.0])
 
     gyroNoiseStd = 0.005
@@ -36,24 +30,19 @@ class TestPIDController(unittest.TestCase):
     Kp = 20 * (self.I.diagonal()/np.max(self.I))
     Ki = 0.4 * (self.I.diagonal()/np.max(self.I))
     Kd = 400 * (self.I.diagonal()/np.max(self.I))
-    controller = PIDController(Kp, Ki, Kd, qInit, self.dt)
+    controller = PIDController(Kp, Ki, Kd, self.dt)
 
     rwMaxRPM = 2000
     rwInitialSpeed = np.zeros(3)
+
     reactionWheel = ReactionWheel(rwMaxRPM, self.rwMass, self.rwRadius, rwInitialSpeed, self.dt)
-
-    realOrientation = self.simulate(desiredQ, qInit, gyroscope, controller, reactionWheel)
-
+    realOrientation = self.simulate(desiredQ, gyroscope, controller, reactionWheel)
     Plotter.plotOmega(np.array(gyroscope.omegaList), title='Omega of the spacecraft')
-    Plotter.plotOmega(np.array(gyroscope.omegaNoisyList), title='GyroScope Data (With Gyro Noise)')
     np.save('realOrientation', realOrientation)
     Plotter.plot3D(realOrientation, self.mass, self.I)
 
-  def simulate(self, desiredQ, initialQ, gyro, controller, reactionwheel):
-    """
-    Simulates spacecraft dynamics and pid control.
-    """
-    realOrientation = [Quaternion(initialQ[0],initialQ[1:])]
+  def simulate(self, desiredQ, gyro, controller, reactionwheel):
+    realOrientation = [Quaternion(1)]
     nD = len(desiredQ)
 
     for t in np.arange(self.dt, self.simTime*nD, self.dt):
@@ -66,7 +55,6 @@ class TestPIDController(unittest.TestCase):
 
       realOrientation.append(calculateCurrentOrientation(realOrientation[-1], gyro.omegaList[-1], gyro.dt))
 
-    controller.plot()
     return np.array(realOrientation)
 
 if __name__ == '__main__':

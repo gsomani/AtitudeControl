@@ -8,7 +8,6 @@ class Gyroscope(object):
         self.torque = initialTorque
         self.noiseStd=noiseStd
         self.omegaList = [self.initialOmega]
-        self.omegaNoisyList = [self.initialOmega]
         self.dt = dt
 
     def simulateRotation(self, torque):
@@ -20,7 +19,6 @@ class Gyroscope(object):
         omega = self.omegaList[-1] + omegadot * self.dt
         omegaNoisy = omega + np.random.randn(3) * self.noiseStd
         self.omegaList.append(omega)
-        self.omegaNoisyList.append(omegaNoisy)
         return omegaNoisy
 
 class ReactionWheel(object):
